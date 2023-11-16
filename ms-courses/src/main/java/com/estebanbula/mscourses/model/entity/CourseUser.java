@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "courses_users")
+@IdClass(CourseUserId.class)
 public class CourseUser {
 
     @Id
     @Column(name = "course_id")
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String courseId;
+    @Id
     @Column(name = "user_id", unique = true)
     private String userId;
 

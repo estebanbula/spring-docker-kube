@@ -1,6 +1,9 @@
 package com.estebanbula.mscourses.service.impl;
 
+import com.estebanbula.mscourses.http.UserClientRest;
 import com.estebanbula.mscourses.model.entity.Course;
+import com.estebanbula.mscourses.model.entity.CourseUser;
+import com.estebanbula.mscourses.model.pojo.User;
 import com.estebanbula.mscourses.repository.CourseRepository;
 import com.estebanbula.mscourses.service.CourseService;
 import org.springframework.stereotype.Service;
@@ -14,9 +17,11 @@ import java.util.UUID;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
+    private final UserClientRest httpUserClient;
 
-    public CourseServiceImpl(CourseRepository courseRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, UserClientRest httpUserClient) {
         this.courseRepository = courseRepository;
+        this.httpUserClient = httpUserClient;
     }
 
     @Override
@@ -27,15 +32,20 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional(readOnly = true)
-    public Course findCourse(String id) {
-        return courseRepository.findById(id)
-                .orElseThrow();
+    public Optional<Course> findCourse(String id) {
+        Optional<Course> course = courseRepository.findById(id);
+        if (course.isPresent() && !course.get().getCourseUsers().isEmpty()) {
+            List<String> ids = course.get().getCourseUsers().stream().map(CourseUser::getUserId).toList();
+            List<User> users = httpUserClient.listUsers(ids);
+            course.get().setUsers(users);
+            return course;
+        }
+        return Optional.empty();
     }
 
     @Override
     @Transactional
     public Course saveCourse(Course course) {
-        course.setId(UUID.randomUUID().toString());
         return courseRepository.save(course);
     }
 
@@ -55,5 +65,52 @@ public class CourseServiceImpl implements CourseService {
     @Transactional
     public void deleteCourse(String id) {
         courseRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public Optional<User> assignUser(String courseId, String userId) {
+        Optional<Course> course = courseRepository.findById(courseId);
+        if (course.isPresent()) {
+            User responseUser = httpUserClient.userDetail(userId);
+            CourseUser courseUser = new CourseUser();
+            courseUser.setCourseId(courseId);
+            courseUser.setUserId(responseUser.getId());
+            course.get().addCourseUser(courseUser);
+            courseRepository.save(course.get());
+            return Optional.of(responseUser);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional
+    public Optional<User> createUser(String courseId, User user) {
+        Optional<Course> course = courseRepository.findById(courseId);
+        if (course.isPresent()) {
+            User responseUser = httpUserClient.createUser(user);
+            CourseUser courseUser = new CourseUser();
+            courseUser.setCourseId(courseId);
+            courseUser.setUserId(responseUser.getId());
+            course.get().addCourseUser(courseUser);
+            courseRepository.save(course.get());
+            return Optional.of(responseUser);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional
+    public Optional<User> deleteUserFromCourse(String courseId, String userId) {
+        Optional<Course> course = courseRepository.findById(courseId);
+        if (course.isPresent()) {
+            User responseUser = httpUserClient.userDetail(userId);
+            CourseUser courseUser = new CourseUser();
+            courseUser.setUserId(responseUser.getId());
+            course.get().removeCourseUser(courseUser);
+            courseRepository.save(course.get());
+            return Optional.of(responseUser);
+        }
+        return Optional.empty();
     }
 }

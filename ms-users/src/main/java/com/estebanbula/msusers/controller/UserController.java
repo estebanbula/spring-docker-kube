@@ -23,6 +23,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsers());
     }
 
+    @GetMapping("/users-by-course")
+    public ResponseEntity<List<User>> retrieveAllUsersById(@RequestParam List<String> ids) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllById(ids));
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<User> retrieveUser(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findUser(id));
