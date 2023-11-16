@@ -42,6 +42,14 @@ public class Course {
         this.name = name;
     }
 
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
     public void addCourseUser(CourseUser courseUser) {
         courseUsers.add(courseUser);
     }

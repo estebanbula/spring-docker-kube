@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface UserService {
 
     List<User> findAllUsers();
+    List<User> findAllById(List<String> ids);
     User findUser(String id);
     User saveUser(User user);
     User updateUser(String id, User user);

@@ -25,6 +25,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> findAllById(List<String> ids) {
+        return (List<User>) userRepository.findAllById(ids);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public User findUser(String id) {
         return userRepository.findById(id)
@@ -34,7 +39,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User saveUser(User user) {
-        user.setId(UUID.randomUUID().toString());
         return userRepository.save(user);
     }
 
