@@ -2,7 +2,7 @@ spring:
   application:
     name: ms-users
   datasource:
-    url: jdbc:mysql://localhost:3306/ms-users
+    url: jdbc:mysql://host.docker.internal:3306/ms-users
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
