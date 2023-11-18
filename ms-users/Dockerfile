@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY ./build/libs/ms-users-0.0.1-SNAPSHOT.jar .
 
-EXPOSE 8801
+ENV APP_PORT 8801
+EXPOSE $APP_PORT
 
 ENTRYPOINT ["java", "-jar", "ms-users-0.0.1-SNAPSHOT.jar"]
