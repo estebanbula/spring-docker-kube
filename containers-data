@@ -1,0 +1,6 @@
+docker run --name mysql-db -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=ms-users -p 3306:3306 --volume world-db:/var/lib/mysql mysql
+
+docker run --name postgres-db -e POSTGRES_PASSWORD=root -e POSTGRES_DB=ms-courses -p 5432:5432 --volume ms-courses:/var/lib/postgres postgres
+
+docker run --name ms-users-container -p 8801:8801 --env-file .\env ms-users
+docker run --name ms-courses-container -p 8802:8802 --env-file .\env ms-courses

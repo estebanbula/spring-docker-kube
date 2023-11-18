@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY ./build/libs/ms-courses-0.0.1-SNAPSHOT.jar .
 
-EXPOSE 8802
+ENV APP_PORT 8802
+EXPOSE $APP_PORT
 
 ENTRYPOINT ["java", "-jar", "ms-courses-0.0.1-SNAPSHOT.jar"]
