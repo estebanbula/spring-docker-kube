@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  mysql-db:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ms-users
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ms-users:/var/lib/mysql
+  postgres-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ms-courses
+    volumes:
+      - ms-courses:/var/lib/postgres
+  ms-users-container:
+    container_name: ms-users-container
+    image: ms-users
+    ports:
+      - "8801:8801"
+    env_file:
+      - ./ms-users/.env
+    depends_on:
+      - mysql-db
+  ms-courses-container:
+    container_name: ms-courses-container
+    image: ms-courses
+    ports:
+      - "8802:8802"
+    env_file:
+      - ./ms-courses/.env
+    depends_on:
+      - postgres-db
+
+volumes:
+  ms-users:
+    name: ms-users
+  ms-courses:
+    name: ms-courses
